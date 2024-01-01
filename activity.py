@@ -2,13 +2,14 @@ import os
 import random
 from datetime import datetime, timedelta
 
-# date input function
+# ------------------ DATE INPUT ------------------
 def get_date_input():
     start = input("Enter start date (YYYY-MM-DD): ")
     end = input("Enter end date (YYYY-MM-DD): ")
     return datetime.strptime(start, "%Y-%m-%d"), datetime.strptime(end, "%Y-%m-%d")
 
-# simple commits
+
+# ------------------ SIMPLE COMMITS ------------------
 def simple_commits(start_date, end_date):
     delta = end_date - start_date
 
@@ -23,7 +24,8 @@ def simple_commits(start_date, end_date):
             os.system("git add .")
             os.system(f'git commit --date="{date}" -m "simple commit {j}"')
 
-# intensity commits
+
+# ------------------ INTENSITY COMMITS ------------------
 def intensity_commits(start_date, end_date, level):
     if level == "low":
         min_c, max_c = 1, 2
@@ -45,18 +47,46 @@ def intensity_commits(start_date, end_date, level):
             os.system("git add .")
             os.system(f'git commit --date="{date}" -m "intensity commit {j}"')
 
-# pattern commits (basic)
-def pattern_commits(start_date, end_date, text):
-    delta = end_date - start_date
-    pattern_days = len(text)
 
-    for i in range(delta.days + 1):
+# ------------------ PATTERN COMMITS (REAL GRID BASED) ------------------
+def pattern_commits(start_date, end_date, text):
+    # 5x7 style font (simplified)
+    font = {
+        "A": [" 1 ", "1 1", "111", "1 1", "1 1"],
+        "V": ["1 1", "1 1", "1 1", " 1 ", " 1 "],
+        "I": ["111", " 1 ", " 1 ", " 1 ", "111"],
+        "N": ["1 1", "111", "111", "111", "1 1"]
+    }
+
+    # build pattern grid
+    grid = []
+    for row in range(5):
+        line = ""
+        for ch in text:
+            if ch in font:
+                line += font[ch][row] + "  "
+        grid.append(line)
+
+    # store pattern positions
+    pattern_positions = set()
+    for r, row in enumerate(grid):
+        for c, val in enumerate(row):
+            if val == "1":
+                pattern_positions.add((r, c))
+
+    delta = (end_date - start_date).days
+
+    for i in range(delta + 1):
         date = start_date + timedelta(days=i)
 
-        if i < pattern_days:
-            commits = 6
+        row = date.weekday()  # 0–6 (Mon–Sun)
+        col = i // 7
+
+        # map into pattern grid
+        if (row % 5, col % len(grid[0])) in pattern_positions:
+            commits = random.randint(5, 8)
         else:
-            commits = 1
+            continue  # blank space
 
         for j in range(commits):
             with open("data.txt", "a") as f:
@@ -65,11 +95,12 @@ def pattern_commits(start_date, end_date, text):
             os.system("git add .")
             os.system(f'git commit --date="{date}" -m "pattern commit {j}"')
 
-# main menu
-print("Choose option:")
+
+# ------------------ MAIN MENU ------------------
+print("\nChoose option:")
 print("1. Simple commits")
 print("2. Intensity control")
-print("3. Pattern (text)")
+print("3. Pattern (text like AVIN)")
 
 choice = input("Enter choice (1/2/3): ")
 
@@ -83,11 +114,14 @@ elif choice == "2":
     intensity_commits(start_date, end_date, level)
 
 elif choice == "3":
-    text = input("Enter text (e.g. AVIN): ")
+    text = input("Enter text (e.g. AVIN): ").upper()
     pattern_commits(start_date, end_date, text)
 
 else:
     print("Invalid choice")
 
+# push to GitHub
 os.system("git branch -M main")
 os.system("git push -u origin main")
+
+print("\n✅ Done! Check your GitHub profile 🚀")
