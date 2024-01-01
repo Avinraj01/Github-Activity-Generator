@@ -2,6 +2,47 @@ import os
 import random
 from datetime import datetime, timedelta
 
+# ------------------ FONT MAP ------------------
+FONT = {
+    "A": [" 1 ", "1 1", "111", "1 1", "1 1"],
+    "B": ["11 ", "1 1", "11 ", "1 1", "11 "],
+    "C": [" 11", "1  ", "1  ", "1  ", " 11"],
+    "D": ["11 ", "1 1", "1 1", "1 1", "11 "],
+    "E": ["111", "1  ", "11 ", "1  ", "111"],
+    "F": ["111", "1  ", "11 ", "1  ", "1  "],
+    "G": [" 11", "1  ", "1 1", "1 1", " 11"],
+    "H": ["1 1", "1 1", "111", "1 1", "1 1"],
+    "I": ["111", " 1 ", " 1 ", " 1 ", "111"],
+    "J": ["111", "  1", "  1", "1 1", " 1 "],
+    "K": ["1 1", "1 1", "11 ", "1 1", "1 1"],
+    "L": ["1  ", "1  ", "1  ", "1  ", "111"],
+    "M": ["1 1", "111", "111", "1 1", "1 1"],
+    "N": ["1 1", "111", "111", "111", "1 1"],
+    "O": ["111", "1 1", "1 1", "1 1", "111"],
+    "P": ["111", "1 1", "111", "1  ", "1  "],
+    "Q": ["111", "1 1", "1 1", "111", "  1"],
+    "R": ["111", "1 1", "111", "1 1", "1 1"],
+    "S": ["111", "1  ", "111", "  1", "111"],
+    "T": ["111", " 1 ", " 1 ", " 1 ", " 1 "],
+    "U": ["1 1", "1 1", "1 1", "1 1", "111"],
+    "V": ["1 1", "1 1", "1 1", " 1 ", " 1 "],
+    "W": ["1 1", "1 1", "111", "111", "1 1"],
+    "X": ["1 1", " 1 ", " 1 ", " 1 ", "1 1"],
+    "Y": ["1 1", " 1 ", " 1 ", " 1 ", " 1 "],
+    "Z": ["111", "  1", " 1 ", "1  ", "111"],
+
+    "0": ["111", "1 1", "1 1", "1 1", "111"],
+    "1": [" 1 ", "11 ", " 1 ", " 1 ", "111"],
+    "2": ["111", "  1", "111", "1  ", "111"],
+    "3": ["111", "  1", "111", "  1", "111"],
+    "4": ["1 1", "1 1", "111", "  1", "  1"],
+    "5": ["111", "1  ", "111", "  1", "111"],
+    "6": ["111", "1  ", "111", "1 1", "111"],
+    "7": ["111", "  1", " 1 ", " 1 ", " 1 "],
+    "8": ["111", "1 1", "111", "1 1", "111"],
+    "9": ["111", "1 1", "111", "  1", "111"]
+}
+
 # ------------------ DATE INPUT ------------------
 def get_date_input():
     start = input("Enter start date (YYYY-MM-DD): ")
@@ -9,119 +50,95 @@ def get_date_input():
     return datetime.strptime(start, "%Y-%m-%d"), datetime.strptime(end, "%Y-%m-%d")
 
 
-# ------------------ SIMPLE COMMITS ------------------
-def simple_commits(start_date, end_date):
-    delta = end_date - start_date
-
+# ------------------ SIMPLE ------------------
+def simple_commits(start, end):
+    delta = end - start
     for i in range(delta.days + 1):
-        date = start_date + timedelta(days=i)
-        commits = random.randint(1, 3)
-
-        for j in range(commits):
+        date = start + timedelta(days=i)
+        for _ in range(random.randint(1, 3)):
             with open("data.txt", "a") as f:
-                f.write(f"{date} commit {j}\n")
-
+                f.write(str(date))
             os.system("git add .")
-            os.system(f'git commit --date="{date}" -m "simple commit {j}"')
+            os.system(f'git commit --date="{date}" -m "simple commit"')
 
 
-# ------------------ INTENSITY COMMITS ------------------
-def intensity_commits(start_date, end_date, level):
-    if level == "low":
-        min_c, max_c = 1, 2
-    elif level == "medium":
-        min_c, max_c = 2, 4
-    else:
-        min_c, max_c = 4, 7
+# ------------------ INTENSITY ------------------
+def intensity_commits(start, end, level):
+    levels = {"low": (1,2), "medium": (2,4), "high": (4,7)}
+    min_c, max_c = levels.get(level, (1,3))
 
-    delta = end_date - start_date
-
+    delta = end - start
     for i in range(delta.days + 1):
-        date = start_date + timedelta(days=i)
-        commits = random.randint(min_c, max_c)
-
-        for j in range(commits):
+        date = start + timedelta(days=i)
+        for _ in range(random.randint(min_c, max_c)):
             with open("data.txt", "a") as f:
-                f.write(f"{date} intensity {j}\n")
-
+                f.write(str(date))
             os.system("git add .")
-            os.system(f'git commit --date="{date}" -m "intensity commit {j}"')
+            os.system(f'git commit --date="{date}" -m "intensity commit"')
 
 
-# ------------------ PATTERN COMMITS (REAL GRID BASED) ------------------
-def pattern_commits(start_date, end_date, text):
-    # 5x7 style font (simplified)
-    font = {
-        "A": [" 1 ", "1 1", "111", "1 1", "1 1"],
-        "V": ["1 1", "1 1", "1 1", " 1 ", " 1 "],
-        "I": ["111", " 1 ", " 1 ", " 1 ", "111"],
-        "N": ["1 1", "111", "111", "111", "1 1"]
-    }
+# ------------------ PATTERN ------------------
+def pattern_commits(start, end, text):
+    text = text.upper()
 
-    # build pattern grid
     grid = []
-    for row in range(5):
+    for r in range(5):
         line = ""
         for ch in text:
-            if ch in font:
-                line += font[ch][row] + "  "
+            if ch in FONT:
+                line += FONT[ch][r] + "  "
         grid.append(line)
 
-    # store pattern positions
-    pattern_positions = set()
+    positions = set()
     for r, row in enumerate(grid):
         for c, val in enumerate(row):
             if val == "1":
-                pattern_positions.add((r, c))
+                positions.add((r, c))
 
-    delta = (end_date - start_date).days
+    delta = (end - start).days
 
     for i in range(delta + 1):
-        date = start_date + timedelta(days=i)
-
-        row = date.weekday()  # 0–6 (Mon–Sun)
+        date = start + timedelta(days=i)
+        row = date.weekday()
         col = i // 7
 
-        # map into pattern grid
-        if (row % 5, col % len(grid[0])) in pattern_positions:
-            commits = random.randint(5, 8)
+        if (row % 5, col % len(grid[0])) in positions:
+            commits = random.randint(5,8)
         else:
-            continue  # blank space
+            continue
 
-        for j in range(commits):
+        for _ in range(commits):
             with open("data.txt", "a") as f:
-                f.write(f"{date} pattern {j}\n")
-
+                f.write(str(date))
             os.system("git add .")
-            os.system(f'git commit --date="{date}" -m "pattern commit {j}"')
+            os.system(f'git commit --date="{date}" -m "pattern {text}"')
 
 
-# ------------------ MAIN MENU ------------------
+# ------------------ MAIN ------------------
 print("\nChoose option:")
 print("1. Simple commits")
 print("2. Intensity control")
-print("3. Pattern (text like AVIN)")
+print("3. Pattern (ANY text)")
 
-choice = input("Enter choice (1/2/3): ")
+choice = input("Enter choice: ")
 
-start_date, end_date = get_date_input()
+start, end = get_date_input()
 
 if choice == "1":
-    simple_commits(start_date, end_date)
+    simple_commits(start, end)
 
 elif choice == "2":
-    level = input("Enter intensity (low/medium/high): ").lower()
-    intensity_commits(start_date, end_date, level)
+    level = input("Enter intensity (low/medium/high): ")
+    intensity_commits(start, end, level)
 
 elif choice == "3":
-    text = input("Enter text (e.g. AVIN): ").upper()
-    pattern_commits(start_date, end_date, text)
+    text = input("Enter text (A-Z, 0-9): ")
+    pattern_commits(start, end, text)
 
 else:
     print("Invalid choice")
 
-# push to GitHub
 os.system("git branch -M main")
 os.system("git push -u origin main")
 
-print("\n✅ Done! Check your GitHub profile 🚀")
+print("✅ Done! Check GitHub 🚀")
