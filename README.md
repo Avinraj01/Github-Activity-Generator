@@ -1,6 +1,9 @@
 # 🧠 GitHub Activity Generator
 
 > 🚀 Generate custom GitHub contribution graph using Python
+<!--snakegif-->
+
+<img align="center" src="https://raw.githubusercontent.com/BEPb/BEPb/output/github-contribution-grid-snake.svg" alt="GitHub Streak" />
 
 ---
 
