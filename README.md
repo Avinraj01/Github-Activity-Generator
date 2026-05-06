@@ -5,7 +5,8 @@
 
 ---
 
-![Demo](https://raw.githubusercontent.com/BEPb/BEPb/output/github-contribution-grid-snake.svg)
+![Example Game](example.gif)
+
 
 ---
 
@@ -188,6 +189,12 @@ AVIN
 * 📊 Live preview before commit
 * 🤖 AI-based pattern generation
 * ☁️ GitHub Actions automation
+
+---
+
+
+![Demo](https://raw.githubusercontent.com/BEPb/BEPb/output/github-contribution-grid-snake.svg)
+
 
 ---
 
